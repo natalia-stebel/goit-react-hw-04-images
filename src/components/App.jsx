@@ -16,6 +16,10 @@ export class App extends Component {
   
   };
 
+  componentDidMount() {
+    this.searchImages();
+  }
+
   searchImages() {
     const { searchQuery, page } = this.state;
 
@@ -54,7 +58,7 @@ export class App extends Component {
     });
     this.toggleModal();
   };
-  
+
   onSubmit = value => {
     this.setState({ searchQuery: value });
   };

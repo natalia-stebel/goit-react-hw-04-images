@@ -2,11 +2,11 @@
 import {ImageGalleryItem} from "components/ImageGalleryItem/ImageGalleryItem"
 
 
-export const ImageGallery = ({ items, onOpenModal}) => {
+export const ImageGallery = ({ images, onOpenModal}) => {
   return (
     <ul >
-      {items.map(item => (
-        <ImageGalleryItem openModal={onOpenModal} key={item.id} image={item.webformatURL} />
+      {images.map(image => (
+        <ImageGalleryItem openModal={onOpenModal} key={image.id} image={image.webformatURL} />
       ))}
     </ul>
   );
