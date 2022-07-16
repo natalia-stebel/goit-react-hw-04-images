@@ -1,7 +1,8 @@
 
 import PropTypes from 'prop-types';
 
-export const ImageGalleryItem = ({ id, image, onOpenModal }) => {
+export const ImageGalleryItem =({image, id}) =>{
+    
   
     return (
       <li key={id}>
@@ -9,11 +10,10 @@ export const ImageGalleryItem = ({ id, image, onOpenModal }) => {
           src={image.webformatURL}
           alt={image.tags}
           data-img={image.largeImageURL}
-          onClick={onOpenModal}
         />
       </li>
     );
- 
+    
 };
 
   ImageGalleryItem.propTypes = {
