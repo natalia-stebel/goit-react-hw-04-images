@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { GlobalStyle } from './GlobalStyle';
-
 import {SearchBar} from './Searchbar/Searchbar';
 import * as API from "./services/api"
 import {ImageGallery} from "./ImageGallery/ImageGallery"
 import  Modal  from './Modal/Modal';
-
+import Button from "./Button/Button"
+import {Spinner} from "./Loader/Loader"
 
 export class App extends Component {
 
@@ -46,6 +46,11 @@ export class App extends Component {
 
   API.fetchImage(searchQuery, page)
   .then(data => {
+
+    if (data.length === 0) {
+      return alert('There is no image with this name');
+    }
+
     if (page === 1) {
       this.setState({
         totalHits: data.totalHits,
@@ -55,6 +60,8 @@ export class App extends Component {
     } else {
       this.setState(prevState => ({
         images: [...prevState.images, ...data.hits],
+        page: prevState.page + 1,
+        isLoading: false,
       }));
 
       window.scrollBy({
@@ -69,9 +76,9 @@ export class App extends Component {
 
   }
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
-  };
+  // toggleModal = () => {
+  //   this.setState(({ showModal }) => ({ showModal: !showModal }));
+  // };
   
   handleClickImage = largeImage => {
     this.openModal(largeImage);
@@ -82,17 +89,22 @@ export class App extends Component {
 
   closeModal = () => this.setState({ openModal: false, originalImageURL: '' });
 
-
+ loadMoreClick = () => {
+    this.setState( prevState => ({
+      page: prevState.page + 1,
+    }))
+  }
 
 
   render() {
 
-    const{images, openModal, originalImageURL}= this.state
+    const{images, openModal, originalImageURL, isLoading}= this.state
+    const buttonIsShow = images.length > 0 && !isLoading;
 
     return (
       <>
         <GlobalStyle />
-      {this.state.isLoading && <div>LOADING</div>}
+      
       <SearchBar onSubmit={this.searchQuerySubmit}/>
       <ImageGallery images={images} onClick={this.handleClickImage} />
       
@@ -102,6 +114,8 @@ export class App extends Component {
             closeModal={this.closeModal}
           ></Modal>
         )}
+        {isLoading && <Spinner />}
+        { buttonIsShow && <Button onClick={this.loadMoreClick} />}
         
     </>)
   }
