@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { GlobalStyle } from './GlobalStyle';
 
 import {SearchBar} from './Searchbar/Searchbar';
 import * as API from "./services/api"
 import {ImageGallery} from "./ImageGallery/ImageGallery"
+import  Modal  from './Modal/Modal';
+
 
 export class App extends Component {
 
@@ -10,22 +13,38 @@ export class App extends Component {
     images: [],
     isLoading: false,
     page:1,
-    query:"",
+    searchQuery: '',
     totalHits: 0,
-
+    originalImageURL: null,
+    openModal: false,
+  
   }
 
-  onChangeQuery = query => {
-    this.setState({ query: query });
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.searchQuery !== this.state.searchQuery) {
+      this.getImages();
+    }
+    if (prevState.page !== this.state.page) {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+
+  searchQuerySubmit = (query) => {
+    this.setState({ searchQuery: query, page: 1, images: [] });
   };
 
   getImages =() =>{
 
-  const {query,page} = this.state;
-
+  const {searchQuery,page} = this.state;
+ 
   this.setState({ isLoading: true });
 
-  API.fetchImage(query, page)
+
+  API.fetchImage(searchQuery, page)
   .then(data => {
     if (page === 1) {
       this.setState({
@@ -54,32 +73,35 @@ export class App extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
   
+  handleClickImage = largeImage => {
+    this.openModal(largeImage);
+  };
 
-//    fetchImage = async (values) =>{
-//     try{
-//     this.setState({isLoading: true})
-//     const item = await API.fetchImage(values);
-//     this.setState(state =>({images: [...state.images, item],
-//     isLoading: false,
-//   }));
-// } catch (error) {
-//   console.log(error);
-// }
-    
-//   }
+  openModal = largeImage =>
+    this.setState({ openModal: true, originalImageURL: largeImage });
 
-  
+  closeModal = () => this.setState({ openModal: false, originalImageURL: '' });
+
+
+
 
   render() {
 
-    const{images}= this.state
+    const{images, openModal, originalImageURL}= this.state
 
     return (
       <>
+        <GlobalStyle />
       {this.state.isLoading && <div>LOADING</div>}
-      <SearchBar onSubmit={this.getImages}/>
-      <ImageGallery images={images} toggleModal={this.toggleModal}/>
-        
+      <SearchBar onSubmit={this.searchQuerySubmit}/>
+      <ImageGallery images={images} onClick={this.handleClickImage} />
+      
+      {openModal && (
+          <Modal
+            largeImage={originalImageURL}
+            closeModal={this.closeModal}
+          ></Modal>
+        )}
         
     </>)
   }
