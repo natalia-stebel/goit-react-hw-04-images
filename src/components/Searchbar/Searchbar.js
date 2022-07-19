@@ -27,7 +27,7 @@ export class Searchbar extends Component {
           <input
             className={css.SearchForminput}
             type="text"
-            value={this.state.inputValue}
+            value={this.state.query}
             onChange={this.handleChange}
             placeholder="Search images and photos"
           />
