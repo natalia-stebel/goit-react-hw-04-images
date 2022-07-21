@@ -10,7 +10,7 @@ export class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.q.trim() === '') {
-      toast.error('Enter data for searching');
+      toast.error('The request for swarching is empty:(');
       return;
     }
 
