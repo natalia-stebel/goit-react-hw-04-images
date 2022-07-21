@@ -10,7 +10,9 @@ export class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.q.trim() === '') {
-      toast.error('Empty request:(');
+      toast.error('Empty:(  Enter request for searching', {
+        position: 'top-center',
+      });
       return;
     }
 

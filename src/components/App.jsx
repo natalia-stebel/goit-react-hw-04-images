@@ -21,10 +21,13 @@ export class App extends Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      this.getImages();
+    if (
+      prevState.page !== this.state.page ||
+      prevState.searchQuery !== this.state.searchQuery
+    ) {
+      this.getImages(this.state.searchQuery, this.state.page);
     }
-    if (prevState.page !== this.state.page) {
+    if (this.state.totalHits.length > 12) {
       window.scrollTo({
         top: document.documentElement.scrollHeight,
         behavior: 'smooth',
@@ -44,7 +47,9 @@ export class App extends Component {
     API.fetchImage(searchQuery, page)
       .then(data => {
         if (data.hits.length === 0) {
-          return toast.error('There is no image with this name');
+          return toast.error('There is no image with this name', {
+            position: 'top-center',
+          });
         }
 
         if (page === 1) {
@@ -58,20 +63,15 @@ export class App extends Component {
             page: prevState.page + 1,
             isLoading: false,
           }));
-
-          window.scrollBy({
-            top: document.body.clientHeight,
-            behavior: 'smooth',
-          });
         }
       })
       .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
+      .finally(() => {
+        this.setState({
+          isLoading: false,
+        });
+      });
   };
-
-  // toggleModal = () => {
-  //   this.setState(({ showModal }) => ({ showModal: !showModal }));
-  // };
 
   handleClickImage = largeImage => {
     this.openModal(largeImage);
