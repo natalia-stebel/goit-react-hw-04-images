@@ -1,19 +1,26 @@
 import React, { Component } from 'react';
 // import { Formik, Form } from 'formik';
 import css from './searchbar.module.css';
+import { toast } from 'react-toastify';
 
 export class Searchbar extends Component {
   state = { q: '' };
 
   handleSubmit = event => {
     event.preventDefault();
+
+    if (this.state.q.trim() === '') {
+      toast.error('Enter data for searching');
+      return;
+    }
+
     this.props.onSubmit(this.state.q);
     this.setState({ q: '' });
   };
 
   handleChange = event => {
     this.setState({
-      q: event.currentTarget.value,
+      q: event.currentTarget.value.toLowerCase(),
     });
   };
 

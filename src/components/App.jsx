@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { GlobalStyle } from './GlobalStyle';
 import { Searchbar } from './Searchbar/Searchbar';
 import * as API from './services/api';
@@ -42,7 +44,7 @@ export class App extends Component {
     API.fetchImage(searchQuery, page)
       .then(data => {
         if (data.hits.length === 0) {
-          return alert('There is no image with this name');
+          return toast.error('There is no image with this name');
         }
 
         if (page === 1) {
@@ -105,6 +107,7 @@ export class App extends Component {
         )}
         {isLoading && <Spinner />}
         {buttonIsShow && <Button onClick={this.loadMoreClick} />}
+        <ToastContainer autoClose={3000} />
       </>
     );
   }
