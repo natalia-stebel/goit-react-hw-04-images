@@ -3,17 +3,17 @@ import React, { Component } from 'react';
 import css from './searchbar.module.css';
 
 export class Searchbar extends Component {
-  state = { query: '' };
+  state = { q: '' };
 
   handleSubmit = event => {
     event.preventDefault();
-    this.props.onSubmit(this.state.query);
-    this.setState({ query: '' });
+    this.props.onSubmit(this.state.q);
+    this.setState({ q: '' });
   };
 
   handleChange = event => {
     this.setState({
-      query: event.currentTarget.value,
+      q: event.currentTarget.value,
     });
   };
 
@@ -27,7 +27,7 @@ export class Searchbar extends Component {
           <input
             className={css.SearchForminput}
             type="text"
-            value={this.state.query}
+            value={this.state.text}
             onChange={this.handleChange}
             placeholder="Search images and photos"
           />

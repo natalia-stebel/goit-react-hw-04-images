@@ -30,18 +30,18 @@ export class App extends Component {
     }
   }
 
-  searchQuerySubmit = query => {
-    this.setState({ searchQuery: query, page: 1, images: [] });
+  searchQuerySubmit = q => {
+    this.setState({ searchQuery: q, page: 1, images: [] });
   };
 
   getImages = () => {
     const { searchQuery, page } = this.state;
-
+    console.log(this.state);
     this.setState({ isLoading: true });
 
     API.fetchImage(searchQuery, page)
       .then(data => {
-        if (data.length === 0) {
+        if (data.hits.length === 0) {
           return alert('There is no image with this name');
         }
 
