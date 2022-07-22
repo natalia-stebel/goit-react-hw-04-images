@@ -27,12 +27,12 @@ export class App extends Component {
     ) {
       this.getImages(this.state.searchQuery, this.state.page);
     }
-    if (this.state.totalHits.length > 12) {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth',
-      });
-    }
+    // if (this.state.page !== 2 && prevState.page !== this.state.page) {
+    //   window.scrollTo({
+    //     top: document.documentElement.scrollHeight,
+    //     behavior: 'smooth',
+    //   });
+    // }
   }
 
   searchQuerySubmit = q => {
@@ -60,7 +60,8 @@ export class App extends Component {
         } else {
           this.setState(prevState => ({
             images: [...prevState.images, ...data.hits],
-            page: prevState.page + 1,
+            // page: prevState.page + 1,
+
             isLoading: false,
           }));
         }
@@ -83,9 +84,9 @@ export class App extends Component {
   closeModal = () => this.setState({ openModal: false, originalImageURL: '' });
 
   loadMoreClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+    this.setState({ page: this.state.page + 1 });
+    this.getImages(this.state.searchQuery, this.state.page + 1);
+    return;
   };
 
   render() {
