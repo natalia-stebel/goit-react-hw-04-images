@@ -1,115 +1,105 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalStyle } from './GlobalStyle';
-import { Searchbar } from './Searchbar/Searchbar';
+import Searchbar from './Searchbar/Searchbar';
 import * as API from './services/api';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import Modal from './Modal/Modal';
 import Button from './Button/Button';
 import { Spinner } from './Loader/Loader';
 
-export class App extends Component {
-  state = {
-    images: [],
-    isLoading: false,
-    page: 1,
-    searchQuery: '',
-    totalHits: 0,
-    originalImageURL: null,
-    openModal: false,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [openModal, setOpenModal] = useState(false);
+  const [originalImageURL, setOriginalImageURL] = useState('');
+  const [hits, setHits] = useState([]);
+  const [error, setError] = useState(null);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.page !== this.state.page ||
-      prevState.searchQuery !== this.state.searchQuery
-    ) {
-      this.getImages(this.state.searchQuery, this.state.page);
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
     }
-    // if (this.state.page !== 2 && prevState.page !== this.state.page) {
-    //   window.scrollTo({
-    //     top: document.documentElement.scrollHeight,
-    //     behavior: 'smooth',
-    //   });
-    // }
-  }
+    getImages();
+  }, [searchQuery]);
 
-  searchQuerySubmit = q => {
-    this.setState({ searchQuery: q, page: 1, images: [] });
+
+  const searchQuerySubmit = q => {
+    setSearchQuery(q);
+    setPage(1);
+    setImages([]);
+    setIsLoading(true);
+    setError(null);
+    setHits([]);
   };
 
-  getImages = () => {
-    const { searchQuery, page } = this.state;
-    console.log(this.state);
-    this.setState({ isLoading: true });
+  const getImages = () => {
+    const option = { searchQuery, page}
+    setIsLoading(true);
 
-    API.fetchImage(searchQuery, page)
+    API.fetchImage(option)
       .then(data => {
         if (data.hits.length === 0) {
           return toast.error('There is no image with this name', {
-            position: 'top-center',
+            position: 'top-center'
           });
         }
 
         if (page === 1) {
-          this.setState({
-            totalHits: data.totalHits,
-            images: data.hits,
-          });
-        } else {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-            // page: prevState.page + 1,
-
-            isLoading: false,
-          }));
-        }
-      })
-      .catch(error => this.setState({ error }))
-      .finally(() => {
-        this.setState({
-          isLoading: false,
-        });
-      });
+          setHits(hits);
+          setImages(images)
+          };
+        else {
+          (prevState => (
+            setHits([...prevState.images, ...data.hits]);
+            setIsLoading(false);
+          );}
+        
+      }
+      .catch(error => setError(error))
+      .finally(() => 
+        setIsLoading(false);
+        );
+      
   };
 
-  handleClickImage = largeImage => {
-    this.openModal(largeImage);
+  const handleClickImage = largeImage => {
+    setOpenModal(largeImage);
   };
 
-  openModal = largeImage =>
-    this.setState({ openModal: true, originalImageURL: largeImage });
+  const openModal = largeImage => {
+    setOpenModal(true);
+    setOriginalImageURL(largeImage);
+  };
 
-  closeModal = () => this.setState({ openModal: false, originalImageURL: '' });
+  const closeModal = () => {
+    setOpenModal(false), setOriginalImageURL('');
+  };
 
-  loadMoreClick = () => {
-    this.setState({ page: this.state.page + 1 });
-    this.getImages(this.state.searchQuery, this.state.page + 1);
+  const loadMoreClick = () => {
+    setPage(page + 1 );
+    getImages(searchQuery, page + 1);
     return;
   };
 
-  render() {
-    const { images, openModal, originalImageURL, isLoading } = this.state;
-    const buttonIsShow = images.length > 0 && !isLoading;
+  const buttonIsShow = images.length > 0 && !isLoading;
 
-    return (
-      <>
-        <GlobalStyle />
+  return (
+    <>
+      <GlobalStyle />
 
-        <Searchbar onSubmit={this.searchQuerySubmit} />
-        <ImageGallery images={images} onClick={this.handleClickImage} />
+      <Searchbar onSubmit={searchQuerySubmit} />
+      <ImageGallery images={images} onClick={handleClickImage} />
 
-        {openModal && (
-          <Modal
-            largeImage={originalImageURL}
-            closeModal={this.closeModal}
-          ></Modal>
-        )}
-        {isLoading && <Spinner />}
-        {buttonIsShow && <Button onClick={this.loadMoreClick} />}
-        <ToastContainer autoClose={3000} />
-      </>
-    );
-  }
-}
+      {openModal && (
+        <Modal largeImage={originalImageURL} closeModal={closeModal}></Modal>
+      )}
+      {isLoading && <Spinner />}
+      {buttonIsShow && <Button onClick={loadMoreClick} />}
+      <ToastContainer autoClose={2000} />
+    </>
+  );
+};
