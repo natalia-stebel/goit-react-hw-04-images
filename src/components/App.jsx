@@ -20,11 +20,11 @@ export const App = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!searchQuery) {
+    if (!searchQuery || !page) {
       return;
     }
     getImages();
-  }, [searchQuery]);
+  }, [searchQuery, page]);
 
 
   const searchQuerySubmit = q => {
@@ -51,14 +51,13 @@ export const App = () => {
         if (page === 1) {
           setHits(hits);
           setImages(images)
-          };
+          }
         else {
-          (prevState => (
-            setHits([...prevState.images, ...data.hits]);
+          (({ hits }) => setImages([...images, ...hits]))
             setIsLoading(false);
-          );}
+      ;}
         
-      }
+      
       .catch(error => setError(error))
       .finally(() => 
         setIsLoading(false);
@@ -81,14 +80,13 @@ export const App = () => {
 
   const loadMoreClick = () => {
     setPage(page + 1 );
-    getImages(searchQuery, page + 1);
     return;
   };
 
   const buttonIsShow = images.length > 0 && !isLoading;
 
   return (
-    <>
+    <div>
       <GlobalStyle />
 
       <Searchbar onSubmit={searchQuerySubmit} />
@@ -100,6 +98,6 @@ export const App = () => {
       {isLoading && <Spinner />}
       {buttonIsShow && <Button onClick={loadMoreClick} />}
       <ToastContainer autoClose={2000} />
-    </>
+   </div>
   );
 };
