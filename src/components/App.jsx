@@ -53,9 +53,10 @@ export const App = () => {
           setImages(images)
           }
         else {
-          (({ hits }) => setImages([...images, ...hits]))
+         setImages([...images, ...hits])
             setIsLoading(false);
       ;}
+    })
         
       
       .catch(error => setError(error))
@@ -63,7 +64,7 @@ export const App = () => {
         setIsLoading(false);
         );
       
-  };
+  
 
   const handleClickImage = largeImage => {
     setOpenModal(largeImage);
