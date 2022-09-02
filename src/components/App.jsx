@@ -14,7 +14,7 @@ export const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  // const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [originalImageURL, setOriginalImageURL] = useState('');
   const [hits, setHits] = useState([]);
   const [error, setError] = useState(null);
@@ -26,7 +26,6 @@ export const App = () => {
     getImages();
   }, [searchQuery, page]);
 
-
   const searchQuerySubmit = q => {
     setSearchQuery(q);
     setPage(1);
@@ -37,50 +36,42 @@ export const App = () => {
   };
 
   const getImages = () => {
-    const option = { searchQuery, page}
+    const option = { searchQuery, page };
     setIsLoading(true);
-
     API.fetchImage(option)
       .then(data => {
         if (data.hits.length === 0) {
           return toast.error('There is no image with this name', {
-            position: 'top-center'
+            position: 'top-center',
           });
         }
-
         if (page === 1) {
           setHits(hits);
-          setImages(images)
-          }
-        else {
-         setImages([...images, ...hits])
-            setIsLoading(false);
-      ;}
-    })
-        
-      
+          setImages(images);
+        } else {
+          setImages([...images, ...hits]);
+          setIsLoading(false);
+        }
+      })
       .catch(error => setError(error))
-      .finally(() => 
-        setIsLoading(false);
-        );
-      
-  
+      .finally(() => setIsLoading(false));
+  };
 
   const handleClickImage = largeImage => {
     setOpenModal(largeImage);
   };
 
-  const openModal = largeImage => {
-    setOpenModal(true);
-    setOriginalImageURL(largeImage);
+  const toggleModal = () => {
+    setOpenModal(!openModal);
   };
 
-  const closeModal = () => {
-    setOpenModal(false), setOriginalImageURL('');
+  const closeModal = url => {
+    setOriginalImageURL(url);
+    toggleModal();
   };
 
   const loadMoreClick = () => {
-    setPage(page + 1 );
+    setPage(page + 1);
     return;
   };
 
@@ -91,6 +82,7 @@ export const App = () => {
       <GlobalStyle />
 
       <Searchbar onSubmit={searchQuerySubmit} />
+      {error && <p>Oops..Try again!</p>}
       <ImageGallery images={images} onClick={handleClickImage} />
 
       {openModal && (
@@ -99,6 +91,6 @@ export const App = () => {
       {isLoading && <Spinner />}
       {buttonIsShow && <Button onClick={loadMoreClick} />}
       <ToastContainer autoClose={2000} />
-   </div>
+    </div>
   );
 };
