@@ -16,7 +16,7 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [originalImageURL, setOriginalImageURL] = useState('');
-  const [hits, setHits] = useState([]);
+  // const [hits, setHits] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -26,13 +26,17 @@ export const App = () => {
       try {
         setIsLoading(true);
 
-        const images = await fetchImage(searchQuery, page);
+        const { hits } = await fetchImage(searchQuery, page);
         if (page === 1) {
-          setHits(hits);
-          setImages(images);
+          setImages([...images, ...hits]);
         } else {
           setImages([...images, ...hits]);
           setIsLoading(false);
+        }
+        if (hits.length === 0) {
+          return toast.error('There is no image with this name', {
+            position: 'top-center',
+          });
         }
       } catch (error) {
         setError(error);
@@ -54,7 +58,6 @@ export const App = () => {
     setImages([]);
     setIsLoading(true);
     setError(null);
-    // setHits([]);
   };
 
   const handleClickImage = largeImage => {

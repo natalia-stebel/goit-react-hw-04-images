@@ -3,6 +3,7 @@ import css from './ImageGallery.module.css';
 import PropTypes from 'prop-types';
 
 export const ImageGallery = ({ images, onClick }) => {
+  console.log(images);
   return (
     <ul className={css.gallery}>
       {images.map(image => (
@@ -21,6 +22,6 @@ export const ImageGallery = ({ images, onClick }) => {
 };
 
 ImageGallery.propTypes = {
-  images: PropTypes.object.isRequired,
+  images: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
 };
