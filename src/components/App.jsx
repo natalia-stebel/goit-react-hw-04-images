@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalStyle } from './GlobalStyle';
 import Searchbar from './Searchbar/Searchbar';
-import * as API from './services/api';
+import { fetchImage } from './services/api';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import Modal from './Modal/Modal';
 import Button from './Button/Button';
@@ -20,31 +20,13 @@ export const App = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!searchQuery || !page) {
-      return;
-    }
-    getImages();
-  }, [searchQuery, page]);
+    if (!searchQuery) return;
 
-  const searchQuerySubmit = q => {
-    setSearchQuery(q);
-    setPage(1);
-    setImages([]);
-    setIsLoading(true);
-    setError(null);
-    setHits([]);
-  };
+    const getImage = async () => {
+      try {
+        setIsLoading(true);
 
-  const getImages = () => {
-    const option = { searchQuery, page };
-    setIsLoading(true);
-    API.fetchImage(option)
-      .then(data => {
-        if (data.hits.length === 0) {
-          return toast.error('There is no image with this name', {
-            position: 'top-center',
-          });
-        }
+        const images = await fetchImage(searchQuery, page);
         if (page === 1) {
           setHits(hits);
           setImages(images);
@@ -52,9 +34,27 @@ export const App = () => {
           setImages([...images, ...hits]);
           setIsLoading(false);
         }
-      })
-      .catch(error => setError(error))
-      .finally(() => setIsLoading(false));
+      } catch (error) {
+        setError(error);
+        toast.error('Ooops..try again', {
+          position: 'top-center',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getImage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, page]);
+
+  const searchQuerySubmit = data => {
+    setSearchQuery(data);
+    setPage(1);
+    setImages([]);
+    setIsLoading(true);
+    setError(null);
+    // setHits([]);
   };
 
   const handleClickImage = largeImage => {
@@ -82,7 +82,8 @@ export const App = () => {
       <GlobalStyle />
 
       <Searchbar onSubmit={searchQuerySubmit} />
-      {error && <p>Oops..Try again!</p>}
+      {error && <p>Try again</p>}
+
       <ImageGallery images={images} onClick={handleClickImage} />
 
       {openModal && (
