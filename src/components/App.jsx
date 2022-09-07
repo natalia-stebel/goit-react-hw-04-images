@@ -61,15 +61,18 @@ export const App = () => {
   };
 
   const handleClickImage = largeImage => {
-    setOpenModal(largeImage);
+    setOpenModal(!openModal);
+    setOriginalImageURL(largeImage);
+    toggleModal();
   };
 
   const toggleModal = () => {
     setOpenModal(!openModal);
   };
 
-  const closeModal = url => {
-    setOriginalImageURL(url);
+  const closeModal = () => {
+    setOpenModal(false);
+    setOriginalImageURL('');
     toggleModal();
   };
 
